@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(50)
+  email        String        @unique @db.VarChar(255)
+  password     String
+  business     Business[]
+  appointments Appointment[]
+  employee     Employee?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Business {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(50)
+  description String?
+  phone       String?    @unique @db.VarChar(20)
+  email       String?    @unique @db.VarChar(255)
+  ownerId     Int        @map("owner_id")
+  owner       User       @relation(fields: [ownerId], references: [id])
+  services    Service[]
+  employees   Employee[]
+  categories  Category[]
+  location    Location?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("businesses")
+}
+
+model Service {
+  id           Int           @id @default(autoincrement())
+  name         String        @db.VarChar(50)
+  description  String?
+  duration     Int           @db.SmallInt
+  price        Decimal       @db.Decimal(10, 2)
+  businessId   Int           @map("business_id")
+  business     Business      @relation(fields: [businessId], references: [id])
+  employeeId   Int           @map("employee_id")
+  employee     Employee      @relation(fields: [employeeId], references: [id])
+  appointments Appointment[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("services")
+}
+
+model Appointment {
+  id        Int      @id @default(autoincrement())
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  serviceId Int      @map("service_id")
+  service   Service  @relation(fields: [serviceId], references: [id])
+  userId    Int      @map("user_id")
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("appointments")
+}
+
+model Employee {
+  id         Int        @id @default(autoincrement())
+  position   String     @db.VarChar(50)
+  businessId Int        @map("business_id")
+  business   Business   @relation(fields: [businessId], references: [id])
+  userId     Int        @unique @map("user_id")
+  user       User       @relation(fields: [userId], references: [id])
+  shifts     Shift[]
+  services   Service[]
+  categories Category[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("employees")
+}
+
+model Shift {
+  id         Int      @id @default(autoincrement())
+  startTime  DateTime @map("start_time")
+  endTime    DateTime @map("end_time")
+  employeeId Int      @map("employee_id")
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("shifts")
+}
+
+model Location {
+  id         Int      @id @default(autoincrement())
+  address    String   @db.VarChar(255)
+  link       String   @db.VarChar(255)
+  businessId Int      @unique @map("business_id")
+  business   Business @relation(fields: [businessId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("locations")
+}
+
+model Category {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(50)
+  businessId Int      @map("business_id")
+  business   Business @relation(fields: [businessId], references: [id])
+  employeeId Int      @map("employee_id")
+  employee   Employee @relation(fields: [employeeId], references: [id])
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
