@@ -13,3 +13,7 @@ export interface IAuthResponse {
   accessToken: string
   user: IUser
 }
+
+export interface IRegisterForm extends IAuthForm {
+  name: string
+}
