@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
+import { ProfileBody } from '@/components/profile/ProfileBody'
 import { NO_INDEX_PAGE } from '@/constants/seo.constants'
-import { Container } from '@/components/ui/Container'
 
 export const metadata: Metadata = {
   title: 'Profile',
@@ -9,9 +9,5 @@ export const metadata: Metadata = {
 }
 
 export default function ProfilePage() {
-  return (
-    <Container>
-      <>Hi</>
-    </Container>
-  )
+  return <ProfileBody />
 }
